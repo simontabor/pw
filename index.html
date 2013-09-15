@@ -1,0 +1,202 @@
+<html>
+<head>
+  <title>PW</title>
+  <style>
+    body {
+      background: #00A897;
+      color: white;
+      text-align: center;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: 0 auto;
+      -webkit-transition: background 0.2s ease-out;
+      -moz-transition: background 0.2s ease-out;
+      transition: background 0.2s ease-out;
+    }
+
+    .inner {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    body.over {
+      background: rgb(0, 66, 59);
+    }
+
+    h1 {
+      font-weight: 100;
+      padding: 24px 0 10px;
+      margin: 0;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      cursor: move;
+      -webkit-app-region: drag;
+    }
+
+    input {
+      display: inline-block;
+      width: 320px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 3px;
+      padding: 0.2em 1em;
+      font-size: 18px;
+      line-height: 20px;
+      margin: 1em 0 0 0;
+    }
+
+    input::-webkit-input-placeholder {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+    }
+    input:focus {
+      outline: none;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    p {
+      margin: 26px 0 10px;
+    }
+  </style>
+
+  <script>
+    !function(w,d,s,g){g=w[g]=w[g]||function(){(g.q=g.q||[]).push(arguments)};w=d.createElement(s);s=d.getElementsByTagName(s
+    )[0];w.src='https://d1l6p2sc9645hc.cloudfront.net/tracker.js';s.parentNode.insertBefore(w,s)}(window,document,'script','_gs');
+
+    _gs('GSN-931883-L');
+  </script>
+</head>
+<body id="dropbox">
+
+  <div class="inner">
+    <h1>PW</h1>
+
+    <input type="text" id="srv" placeholder="Service">
+    <input type="password" id="pw" placeholder="Password">
+    <!-- <input type="file" multiple id="key"> -->
+
+    <p><span id="password"></span></p>
+  </div>
+
+  <script>
+    var node = typeof require !== 'undefined';
+
+    // use native node crypto if available, else https://github.com/jbt/js-crypto/blob/master/sha1-min.js
+    var sha1 = node ?
+      function(d) { return require('crypto').createHash('sha1').update(d).digest('hex'); } :
+      function(d){for(var j=0,a=0,c=[],k=[1732584193,4023233417,2562383102,271733878,3285377520],e,g,h,l,f,i=unescape(encodeURI(d)),b=i.length;a<=b;)c[a>>2]|=(i.charCodeAt(a)||128)<<8*(3-a++%4);for(c[d=(b>>6<<4)+15]=b<<3;j<=d;j+=16){b=k;for(a=0;80>a;b=[[(f=((i=b[0])<<5|i>>>27)+b[4]+(c[a]=16>a?~~c[j+a]:f<<1|f>>>31)+1518500249)+((e=b[1])&(g=b[2])|~e&(h=b[3])),l=f+(e^g^h)+341275144,f+(e&g|e&h|g&h)+882459459,l+1535694389][0|a++/20]|0,i,e<<30|e>>>2,g,h])f=c[a-3]^c[a-8]^c[a-14]^c[a-16];for(a=5;a;)k[--a]=k[a]+b[a]|0}for(d="";40>a;)d+=(k[a>>3]>>4*(7-a++%8)&15).toString(16);return d};
+
+    function selectText(el) {
+      if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(el);
+        range.select();
+      } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(el);
+        window.getSelection().addRange(range);
+      }
+    }
+
+    var exec = node ? require('child_process').exec : function(){};
+
+    var srv = document.getElementById('srv');
+    var pw = document.getElementById('pw');
+    var password = document.getElementById('password');
+    var key = document.getElementById('key');
+
+    var dropbox = document.getElementById("dropbox");
+    dropbox.addEventListener("dragenter", drag, false);
+    dropbox.addEventListener("dragleave", drag, false);
+    dropbox.addEventListener("dragover", function(e) { e.stopPropagation(); e.preventDefault(); }, false);
+    dropbox.addEventListener("drop", drop, false);
+
+    function drag(e) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if(e.type === 'dragleave') {
+        dropbox.className = '';
+      } else {
+        dropbox.className = 'over';
+      }
+    }
+
+    function drop(e) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      dropbox.className = '';
+
+      var dt = e.dataTransfer;
+      var files = dt.files;
+
+      updateKeyFiles(files);
+    }
+
+    var fileKey = '';
+
+    var update = function() {
+      var service = srv.value.toLowerCase().replace(/ /g, '');
+      var pass = pw.value;
+
+      var word = sha1(service + '||' + pass + '||' + fileKey);
+
+      // so we have some uppercase letters, replace even index chars with uppercase
+      word = word.replace(/[A-z]/g, function(c, i) {
+        return i % 2 === 0 ?
+          c.toUpperCase() :
+          c;
+      });
+
+      password.innerText = word;
+
+      // TODO: add proper cross platform copying (incl web)
+      // will only work on mac app for now
+      exec('echo "'+word+'"  | pbcopy');
+    };
+
+
+    var updateKeyFiles = function(files) {
+
+      var getFile = function(file, cb) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          cb(e);
+        };
+
+        reader.readAsBinaryString(file);
+      };
+
+      var done = 0;
+      var fileList = [];
+
+      var isDone = function(e) {
+        fileList.push(e.target.result);
+        if (++done === files.length) {
+          fileKey = sha1(fileList.join('||'));
+          update();
+        }
+      }
+      for (var i = 0; i < files.length; i++) {
+        getFile(files[i], isDone);
+      }
+
+
+    }
+
+    srv.onkeyup = update;
+    pw.onkeyup = update;
+
+    // key.onchange = function() {
+    //   updateKeyFiles(key.files);
+    // }
+
+    password.onclick = function(e) {
+      selectText(password);
+    }
+  </script>
+</body>
+</html>

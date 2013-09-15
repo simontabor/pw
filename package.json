@@ -1,0 +1,32 @@
+{
+  "name": "PW",
+  "version": "0.0.1",
+  "main": "index.html",
+  "description": "Password generator based on service name, master password and keyfile(s)",
+  "window": {
+    "title": "PW",
+    "toolbar": false,
+    "frame": false,
+    "width": 400,
+    "height": 240,
+    "position": "mouse",
+    "min_width": 400,
+    "min_height": 240,
+    "max_width": 400,
+    "max_height": 240,
+    "always-on-top": false
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/simontabor/pw"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Simon Tabor",
+      "email": "me@simontabor.com",
+      "web": "http://simontabor.com"
+    }
+  ]
+}
