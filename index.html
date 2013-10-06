@@ -65,7 +65,9 @@
     !function(w,d,s,g){g=w[g]=w[g]||function(){(g.q=g.q||[]).push(arguments)};w=d.createElement(s);s=d.getElementsByTagName(s
     )[0];w.src='https://d1l6p2sc9645hc.cloudfront.net/tracker.js';s.parentNode.insertBefore(w,s)}(window,document,'script','_gs');
 
+    if (!window.location.host || !window.location.hostname) window.location.host = window.location.hostname = 'pw.local';
     _gs('GSN-931883-L');
+    _gs('set', 'trackLocal', true);
   </script>
 </head>
 <body id="dropbox">
@@ -82,6 +84,8 @@
 
   <script>
     var node = typeof require !== 'undefined';
+
+    _gs('event', node ? 'Node.js environment' : 'Browser environment');
 
     // use native node crypto if available, else https://github.com/jbt/js-crypto/blob/master/sha1-min.js
     var sha1 = node ?
@@ -156,10 +160,14 @@
       // TODO: add proper cross platform copying (incl web)
       // will only work on mac app for now
       exec('echo "'+word+'"  | pbcopy');
+
+      _gs('event', 'Updated password');
     };
 
 
     var updateKeyFiles = function(files) {
+
+      _gs('event', 'Updating key files');
 
       var getFile = function(file, cb) {
         var reader = new FileReader();
@@ -195,6 +203,7 @@
     // }
 
     password.onclick = function(e) {
+      _gs('event', 'Selected Password');
       selectText(password);
     }
   </script>
