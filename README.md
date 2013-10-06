@@ -6,7 +6,7 @@ Password generator based on service name, master password and keyfile(s).
 
 ## Usage
 
-Can be used either in-browser or as a `node-webkit` application (open index.html, go to [the site](http://simontabor.com/labs/pw), open the Mac App or open app.nw using node-webkit)
+Can be used either in-browser or as a `node-webkit` application (open index.html, go to [the site](http://simontabor.com/labs/pw), open the Mac App or open app.nw using node-webkit). No internet connection required, although if available some usage stats will be sent off (no sensitive data, of course).
 
 Enter a service name (case and space insensitive), e.g. `Twitter`, then a password that you can remember. A nice secure password (SHA1 of everything together) is generated with every even letter being capitalised (as some fields require uppercase, lowercase and a number).
 
