@@ -85,6 +85,8 @@
   <script>
     var node = typeof require !== 'undefined';
 
+    var child_process = node ? require('child_process') : undefined;
+
     _gs('event', node ? 'Node.js environment' : 'Browser environment');
 
     // use native node crypto if available, else https://github.com/jbt/js-crypto/blob/master/sha1-min.js
@@ -103,8 +105,6 @@
         window.getSelection().addRange(range);
       }
     }
-
-    var exec = node ? require('child_process').exec : function(){};
 
     var srv = document.getElementById('srv');
     var pw = document.getElementById('pw');
@@ -159,7 +159,11 @@
 
       // TODO: add proper cross platform copying (incl web)
       // will only work on mac app for now
-      exec('echo "'+word+'"  | pbcopy');
+      if (node) {
+        var copy = child_process.spawn('pbcopy');
+        copy.stdin.write(word);
+        copy.stdin.end();
+      }
 
       _gs('event', 'Updated password');
     };
